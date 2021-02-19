@@ -9,6 +9,8 @@ import requests
 
 from .exceptions import AuthError, ConfigError
 
+SUCCESS_CODES = [200, 201, 202]
+
 
 class Metabasic(object):
     """Instantiates a new Metabasic Client
@@ -83,7 +85,7 @@ class Metabasic(object):
             f"{self.domain}/api/dataset/{export_format}", data=data, headers=headers
         )
 
-        if resp.status_code != 202:
+        if resp.status_code not in SUCCESS_CODES:
             raise Exception(resp)
 
         return resp
@@ -119,7 +121,7 @@ class Metabasic(object):
         body = {"username": email, "password": password}
         resp = requests.post(f"{self.domain}/api/session", json=body, headers=headers)
 
-        if resp.status_code != 200:
+        if resp.status_code not in SUCCESS_CODES:
             raise Exception(resp)
 
         self.session_id = resp.json()["id"]
@@ -142,7 +144,7 @@ class Metabasic(object):
 
         resp = requests.get(f"{self.domain}/api/database", headers=headers)
 
-        if resp.status_code != 200:
+        if resp.status_code not in SUCCESS_CODES:
             raise Exception(resp)
 
         databases = {db["name"]: db["id"] for db in resp.json()}
